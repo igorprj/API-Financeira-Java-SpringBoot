@@ -3,8 +3,11 @@ package com.Api.Financeira.service;
 import com.Api.Financeira.dto.TransactionRequestDTO;
 import com.Api.Financeira.dto.TransactionResponseDTO;
 import com.Api.Financeira.exceptions.TransactionNotFoundException;
+import com.Api.Financeira.exceptions.UserNotFoundException;
 import com.Api.Financeira.model.Transaction;
+import com.Api.Financeira.model.User;
 import com.Api.Financeira.repositories.TransactionRepository;
+import com.Api.Financeira.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,8 @@ import java.util.List;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+
+    private final UserRepository userRepository;
 
     public List<TransactionResponseDTO> findAll(){
         List<Transaction> transaction = transactionRepository.findAll();
@@ -79,5 +84,10 @@ public class TransactionService {
         transaction.setDescricao(transactionRequestDTO.getDescricao());
         transaction.setValor(transactionRequestDTO.getValor());
         transaction.setTipo(transactionRequestDTO.getTipo());
+
+        User user = userRepository.findById(transactionRequestDTO.getUser_id())
+                        .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado!"));
+
+        transaction.setUser(user);
     }
 }

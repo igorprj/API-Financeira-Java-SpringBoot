@@ -1,4 +1,8 @@
 package com.Api.Financeira.dto;
 
-public class UserRequestDTO {
+public record UserRequestDTO(
+        String nome,
+        String email,
+        String senha
+) {
 }

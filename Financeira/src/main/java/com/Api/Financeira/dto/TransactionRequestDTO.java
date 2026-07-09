@@ -1,6 +1,7 @@
 package com.Api.Financeira.dto;
 
 import com.Api.Financeira.enums.TransactionType;
+import com.Api.Financeira.model.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -23,4 +24,5 @@ public class TransactionRequestDTO {
     @Positive
     private BigDecimal valor;
     private TransactionType tipo;
+    private Long user_id;
 }
