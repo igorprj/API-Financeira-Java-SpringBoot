@@ -1,7 +1,10 @@
 package com.Api.Financeira.service;
 
+import com.Api.Financeira.dto.ResumoResponseDTO;
 import com.Api.Financeira.dto.TransactionRequestDTO;
 import com.Api.Financeira.dto.TransactionResponseDTO;
+import com.Api.Financeira.enums.TransactionType;
+import com.Api.Financeira.exceptions.AccessDeniedTransactionException;
 import com.Api.Financeira.exceptions.TransactionNotFoundException;
 import com.Api.Financeira.exceptions.UserNotFoundException;
 import com.Api.Financeira.model.Transaction;
@@ -12,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,8 +27,11 @@ public class TransactionService {
 
     private final UserRepository userRepository;
 
+    private final AuthenticatedUser authenticatedUser;
+
     public List<TransactionResponseDTO> findAll(){
-        List<Transaction> transaction = transactionRepository.findAll();
+        Long userId = authenticatedUser.getUserId();
+        List<Transaction> transaction = transactionRepository.findByUserId(userId);
 
         return transaction.stream()
                 .map(this::toDTO)
@@ -36,6 +44,7 @@ public class TransactionService {
         Transaction transaction = new Transaction();
 
         updateEntity(transaction, transactionRequestDTO);
+        transaction.setUser(authenticatedUser.getUser());
 
         Transaction saved = transactionRepository.save(transaction);
 
@@ -46,6 +55,8 @@ public class TransactionService {
     public TransactionResponseDTO updateTransaction(Long id,  TransactionRequestDTO transactionRequestDTO){
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new TransactionNotFoundException("Transação não encontrada!"));
+
+        validarPropriedade(transaction);
 
         updateEntity(transaction, transactionRequestDTO);
 
@@ -58,6 +69,9 @@ public class TransactionService {
     public void deleteTransaction(Long id){
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new TransactionNotFoundException("Transação não encontrada!"));
+
+        validarPropriedade(transaction);
+
         transactionRepository.delete(transaction);
     }
 
@@ -65,7 +79,48 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new TransactionNotFoundException("Transação não encontrada!"));
 
+        validarPropriedade(transaction);
+
         return toDTO(transaction);
+    }
+
+    public List<TransactionResponseDTO> findByType(TransactionType tipo){
+        List<Transaction> transaction = transactionRepository.findByTipo(tipo);
+
+        return transaction.stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    public List<TransactionResponseDTO> findByPeriodo(LocalDateTime inicio, LocalDateTime fim){
+        Long userId = authenticatedUser.getUserId();
+        List<Transaction> transaction = transactionRepository.findByUserIdAndDataCriacaoBetween(userId, inicio, fim);
+
+        return transaction.stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    public ResumoResponseDTO getResumo(LocalDateTime inicio, LocalDateTime fim){
+        Long userId = authenticatedUser.getUserId();
+
+        List<Transaction> transactions = (inicio != null && fim != null)
+                ? transactionRepository.findByUserIdAndDataCriacaoBetween(userId, inicio, fim)
+                : transactionRepository.findByUserId(userId);
+
+        BigDecimal totalReceitas = transactions.stream()
+                .filter(t -> t.getTipo() == TransactionType.RECEITA)
+                .map(Transaction::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalDespesas = transactions.stream()
+                .filter(t -> t.getTipo() == TransactionType.DESPESAS)
+                .map(Transaction::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal saldo = totalReceitas.subtract(totalDespesas);
+
+        return new ResumoResponseDTO(totalReceitas, totalDespesas, saldo);
     }
 
     private TransactionResponseDTO toDTO(Transaction transaction){
@@ -85,9 +140,12 @@ public class TransactionService {
         transaction.setValor(transactionRequestDTO.getValor());
         transaction.setTipo(transactionRequestDTO.getTipo());
 
-        User user = userRepository.findById(transactionRequestDTO.getUser_id())
-                        .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado!"));
+    }
 
-        transaction.setUser(user);
+    private void validarPropriedade(Transaction transaction){
+        Long userId = authenticatedUser.getUserId();
+        if (!transaction.getUser().getId().equals(userId)) {
+            throw new AccessDeniedTransactionException("Você não tem permissão para acessar essa transação!");
+        }
     }
 }

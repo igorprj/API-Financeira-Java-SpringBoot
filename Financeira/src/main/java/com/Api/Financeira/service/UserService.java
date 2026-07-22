@@ -1,8 +1,10 @@
 package com.Api.Financeira.service;
 
+import com.Api.Financeira.dto.TransactionRequestDTO;
 import com.Api.Financeira.dto.TransactionResponseDTO;
 import com.Api.Financeira.dto.UserRequestDTO;
 import com.Api.Financeira.dto.UserResponseDTO;
+import com.Api.Financeira.exceptions.TransactionNotFoundException;
 import com.Api.Financeira.exceptions.UserNotFoundException;
 import com.Api.Financeira.model.Transaction;
 import com.Api.Financeira.model.User;
@@ -46,6 +48,25 @@ public class UserService {
         User saved = userRepository.save(user);
 
         return toDTO(saved);
+    }
+
+    @Transactional
+    public UserResponseDTO updateUser(Long id,  UserRequestDTO userrequestDTO){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado!"));
+
+        updateEntity(user, userrequestDTO);
+
+        User updated = userRepository.save(user);
+
+        return toDTO(updated);
+    }
+
+    @Transactional
+    public void deleteUser(Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado!"));
+        userRepository.delete(user);
     }
 
     private UserResponseDTO toDTO(User user){

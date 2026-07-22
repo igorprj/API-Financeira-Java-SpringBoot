@@ -28,17 +28,24 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
+        System.out.println("header: " + header);
 
         if(StringUtils.hasText(header) &&  header.startsWith("Bearer ")){
             String token = header.substring(7);
+            System.out.println("token: " + token);
 
             if(tokenProvider.validateToken(token)){
                 String username = tokenProvider.getUsername(token);
+                System.out.println("username: " + username);
                 UserDetails user = userDetailsService.loadUserByUsername(username);
+                System.out.println("user: " + user.getUsername());
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                System.out.println("Autenticado com sucesso");
             }
+        }else{
+            System.out.println("header ausente");
         }
 
         filterChain.doFilter(request,response);
