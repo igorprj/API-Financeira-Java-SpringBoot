@@ -4,7 +4,6 @@ import com.Api.Financeira.dto.ResumoResponseDTO;
 import com.Api.Financeira.dto.TransactionRequestDTO;
 import com.Api.Financeira.dto.TransactionResponseDTO;
 import com.Api.Financeira.enums.TransactionType;
-import com.Api.Financeira.model.Transaction;
 import com.Api.Financeira.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
