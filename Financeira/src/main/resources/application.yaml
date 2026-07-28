@@ -2,10 +2,10 @@ spring:
   application:
     name: Financeira
   datasource:
-    url: jdbc:postgresql://host.docker.internal:5432/financeira
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/financeira}
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
