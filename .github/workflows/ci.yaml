@@ -39,8 +39,8 @@ jobs:
       - name: Build e testes
         working-directory: Financeira
         env:
-          POSTGRES_URL: jdbc:postgresql://localhost:5432/financeira
-          POSTGRES_DB: financeira
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/financeira
+          SPRING_DATASOURCE_DB: financeira
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
         run: ./mvnw clean verify
