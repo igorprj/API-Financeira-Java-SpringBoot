@@ -27,7 +27,9 @@ jobs:
           cache: maven
 
       - name: Dar permissão ao Maven Wrapper
+        working-directory: Financeira
         run: chmod +x mvnw
 
       - name: Build e testes
+        working-directory: Financeira
         run: ./mvnw clean verify
