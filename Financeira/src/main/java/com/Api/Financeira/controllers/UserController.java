@@ -17,12 +17,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDTO createUser(@Valid @RequestBody UserRequestDTO userRequestDTO){
-        return userService.createUser(userRequestDTO);
-    }
-
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<UserResponseDTO> getAllUser(){
