@@ -1,5 +1,6 @@
 package com.Api.Financeira.config;
 
+import com.Api.Financeira.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -21,16 +22,17 @@ public class TokenProvider {
     private String tokenSecret;
 
     public String gerarToken(Authentication authentication) {
-        UserDetails user = (UserDetails) authentication.getPrincipal();
-        return buildToken(user.getUsername());
+        User user = (User) authentication.getPrincipal();
+        return buildToken(user);
     }
 
-    private String buildToken(String username) {
+    private String buildToken(User user) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + tokenExpiration);
 
         return Jwts.builder()
-                .subject(username)
+                .subject(user.getUsername())
+                .claim("role", user.getRole().name())
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(signingKey())

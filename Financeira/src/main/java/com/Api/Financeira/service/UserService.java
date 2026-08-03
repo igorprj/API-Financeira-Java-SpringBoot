@@ -4,6 +4,7 @@ import com.Api.Financeira.dto.TransactionRequestDTO;
 import com.Api.Financeira.dto.TransactionResponseDTO;
 import com.Api.Financeira.dto.UserRequestDTO;
 import com.Api.Financeira.dto.UserResponseDTO;
+import com.Api.Financeira.enums.Role;
 import com.Api.Financeira.exceptions.TransactionNotFoundException;
 import com.Api.Financeira.exceptions.UserNotFoundException;
 import com.Api.Financeira.model.Transaction;
@@ -73,7 +74,8 @@ public class UserService {
         UserResponseDTO dto = new UserResponseDTO(
                 user.getId(),
                 user.getNome(),
-                user.getEmail()
+                user.getEmail(),
+                user.getRole()
         );
 
         return dto;
@@ -83,5 +85,6 @@ public class UserService {
         user.setNome(userRequestDTO.nome());
         user.setEmail(userRequestDTO.email());
         user.setSenha(passwordEncoder.encode(userRequestDTO.senha()));
+        user.setRole(Role.USER);
     }
 }

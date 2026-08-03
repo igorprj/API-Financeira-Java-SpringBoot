@@ -38,6 +38,10 @@ public class SecurityConfig{
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                                .requestMatchers("/v1/users/**").hasRole("ADMIN")
+
+                                .requestMatchers("/v1/transactions/**").hasAnyRole("USER", "ADMIN")
+
                                 .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
