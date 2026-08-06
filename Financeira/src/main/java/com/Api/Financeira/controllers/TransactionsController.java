@@ -5,6 +5,7 @@ import com.Api.Financeira.dto.TransactionRequestDTO;
 import com.Api.Financeira.dto.TransactionResponseDTO;
 import com.Api.Financeira.enums.TransactionType;
 import com.Api.Financeira.service.TransactionService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,6 +18,7 @@ import java.time.YearMonth;
 import java.util.List;
 
 @RestController
+@SecurityRequirement(name = "BearerAuth")
 @RequestMapping("/v1/transactions")
 @RequiredArgsConstructor
 public class TransactionsController {

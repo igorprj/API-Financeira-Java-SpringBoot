@@ -3,6 +3,7 @@ package com.Api.Financeira.controllers;
 import com.Api.Financeira.dto.UserRequestDTO;
 import com.Api.Financeira.dto.UserResponseDTO;
 import com.Api.Financeira.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/users")
+@SecurityRequirement(name = "BearerAuth")
 @RequiredArgsConstructor
 public class UserController {
 
